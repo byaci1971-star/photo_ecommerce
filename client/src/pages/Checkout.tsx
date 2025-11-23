@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState } from "react";
 import { t } from "@/lib/i18n";
@@ -34,6 +34,8 @@ export default function Checkout() {
   });
 
   const createOrderMutation = trpc.orders.create.useMutation();
+  const createCheckoutSession = trpc.orders.createCheckoutSession.useMutation();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const total = cartItems?.reduce((sum, item) => sum + (item.quantity * 1000), 0) || 0;
   const shipping = 500; // CHF 5.00
@@ -49,38 +51,42 @@ export default function Checkout() {
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsProcessing(true);
 
     if (!user) {
       setMessage({ type: "error", text: "Please log in to place an order." });
+      setIsProcessing(false);
       return;
     }
 
     if (!cartItems || cartItems.length === 0) {
       setMessage({ type: "error", text: "Your cart is empty." });
+      setIsProcessing(false);
       return;
     }
 
     try {
-      await createOrderMutation.mutateAsync({
-        total: grandTotal,
-        shippingAddress: `${formData.shippingAddress}, ${formData.shippingCity}, ${formData.shippingZip}, ${formData.shippingCountry}`,
-        billingAddress: formData.sameAsBilling 
-          ? `${formData.shippingAddress}, ${formData.shippingCity}, ${formData.shippingZip}, ${formData.shippingCountry}`
-          : `${formData.billingAddress}, ${formData.billingCity}, ${formData.billingZip}, ${formData.billingCountry}`,
-        items: cartItems.map(item => ({
+      // Create checkout session with Stripe
+      const session = await createCheckoutSession.mutateAsync({
+        cartItems: cartItems.map(item => ({
           productId: item.productId,
           productName: `Product ${item.productId}`,
           price: 1000,
           quantity: item.quantity,
         })),
+        total: grandTotal,
       });
 
-      setMessage({ type: "success", text: "Order placed successfully!" });
-      setTimeout(() => {
-        window.location.href = '/account';
-      }, 2000);
+      if (session.url) {
+        // Redirect to Stripe checkout
+        window.open(session.url, '_blank');
+        setMessage({ type: "success", text: "Redirecting to payment..." });
+      }
     } catch (error) {
-      setMessage({ type: "error", text: "Failed to place order. Please try again." });
+      console.error("Payment error:", error);
+      setMessage({ type: "error", text: "Failed to process payment. Please try again." });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -326,9 +332,16 @@ export default function Checkout() {
                 <Button
                   type="submit"
                   className="flex-1"
-                  disabled={createOrderMutation.isPending}
+                  disabled={isProcessing || createCheckoutSession.isPending}
                 >
-                  {createOrderMutation.isPending ? "Processing..." : t('checkout.place_order', language)}
+                  {isProcessing || createCheckoutSession.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    t('checkout.place_order', language)
+                  )}
                 </Button>
                 <Button variant="outline" className="flex-1" asChild>
                   <Link href="/cart">

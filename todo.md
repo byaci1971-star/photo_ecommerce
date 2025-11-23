@@ -91,3 +91,28 @@
 - [x] Create dropdown navigation menu with categories and subcategories
 - [x] Add subcategory filtering to product listing
 - [x] Update product database to link to subcategories
+
+
+## Mobile Menu & Responsive Navigation
+- [x] Create mobile hamburger menu component
+- [x] Implement responsive sidebar navigation
+- [x] Add mobile menu toggle functionality
+- [x] Test responsive design on mobile devices
+
+## Product Filtering
+- [x] Add product attributes table (size, color, material)
+- [x] Create filter UI component
+- [x] Implement price range filter
+- [x] Implement size/format filter
+- [x] Implement color filter
+- [x] Add filter state management
+- [x] Update product listing to apply filters
+
+## Stripe Payment Integration
+- [x] Add Stripe API keys to environment
+- [x] Create Stripe payment intent procedure
+- [x] Implement Stripe Elements on checkout page
+- [x] Add payment form validation
+- [ ] Handle payment success/failure responses
+- [ ] Update order status after successful payment
+- [ ] Add payment confirmation email

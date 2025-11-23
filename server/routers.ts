@@ -5,6 +5,16 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 
+let stripe: any = null;
+try {
+  const Stripe = require("stripe");
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+    apiVersion: "2024-12-18.acacia",
+  });
+} catch (error) {
+  console.warn("[Stripe] Module not installed, skipping initialization");
+}
+
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
@@ -97,6 +107,65 @@ export const appRouter = router({
           await db.addOrderItems(orderId, input.items);
         }
         return order;
+      }),
+    createCheckoutSession: protectedProcedure
+      .input(z.object({
+        cartItems: z.array(z.object({
+          productId: z.number(),
+          productName: z.string(),
+          price: z.number(),
+          quantity: z.number(),
+        })),
+        total: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!stripe) {
+          throw new Error("Stripe is not configured");
+        }
+
+        try {
+          // Create or get Stripe customer
+          let customerId = ctx.user.stripeCustomerId || null;
+          if (!customerId) {
+            const customer = await stripe.customers.create({
+              email: ctx.user.email,
+              name: ctx.user.name,
+              metadata: {
+                userId: ctx.user.id.toString(),
+              },
+            });
+            customerId = customer.id;
+            await db.updateUserStripeCustomerId(ctx.user.id, customerId as string);
+          }
+
+          // Create checkout session
+          const session = await stripe.checkout.sessions.create({
+            customer: customerId,
+            payment_method_types: ["card"],
+            line_items: input.cartItems.map(item => ({
+              price_data: {
+                currency: "chf",
+                product_data: {
+                  name: item.productName,
+                },
+                unit_amount: item.price,
+              },
+              quantity: item.quantity,
+            })),
+            mode: "payment",
+            success_url: `${ctx.req.headers.origin}/account?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${ctx.req.headers.origin}/checkout`,
+            client_reference_id: ctx.user.id.toString(),
+            metadata: {
+              userId: ctx.user.id.toString(),
+            },
+          });
+
+          return { url: session.url };
+        } catch (error) {
+          console.error("[Stripe] Error creating checkout session:", error);
+          throw new Error("Failed to create checkout session");
+        }
       }),
   }),
 });

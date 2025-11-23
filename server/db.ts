@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, subcategories, products, cartItems, orders, orderItems } from "../drizzle/schema";
+import { InsertUser, users, categories, subcategories, products, cartItems, orders, orderItems, productAttributes } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -237,4 +237,40 @@ export async function addOrderItems(orderId: number, items: Array<{ productId: n
       ...item,
     }))
   );
+}
+
+
+/**
+ * Product attributes queries
+ */
+export async function getProductAttributes(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(productAttributes).where(eq(productAttributes.productId, productId));
+}
+
+export async function getAttributesByType(productId: number, type: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(productAttributes)
+    .where(and(eq(productAttributes.productId, productId), eq(productAttributes.type, type)));
+}
+
+/**
+ * Stripe customer queries
+ */
+export async function updateUserStripeCustomerId(userId: number, stripeCustomerId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.update(users)
+    .set({ stripeCustomerId })
+    .where(eq(users.id, userId));
+}
+
+export async function getUserByStripeCustomerId(stripeCustomerId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.stripeCustomerId, stripeCustomerId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
 }

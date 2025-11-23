@@ -17,6 +17,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -129,3 +130,18 @@ export const orderItems = mysqlTable("orderItems", {
 
 export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = typeof orderItems.$inferInsert;
+
+/**
+ * Product attributes (sizes, colors, materials)
+ */
+export const productAttributes = mysqlTable("productAttributes", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // 'size', 'color', 'material'
+  value: varchar("value", { length: 255 }).notNull(), // e.g., '10x15 cm', 'Red', 'Paper'
+  priceModifier: int("priceModifier").default(0), // Additional price in cents
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ProductAttribute = typeof productAttributes.$inferSelect;
+export type InsertProductAttribute = typeof productAttributes.$inferInsert;

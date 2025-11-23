@@ -9,6 +9,7 @@ import { Link } from "wouter";
 import { ShoppingCart, Heart, Award, Truck, LanguagesIcon } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NavigationMenu } from "@/components/NavigationMenu";
+import { MobileMenu } from "@/components/MobileMenu";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -29,21 +30,24 @@ export default function Home() {
           </Link>
           <NavigationMenu />
           <div className="flex gap-4 items-center">
-            <LanguageSwitcher />
-            <Link href="/cart">
-              <a className="relative">
-                <ShoppingCart className="h-6 w-6" />
-              </a>
-            </Link>
-            {isAuthenticated ? (
-              <Link href="/account">
-                <a className="text-sm hover:text-primary">{user?.name || "Account"}</a>
+            <div className="hidden md:flex gap-4 items-center">
+              <LanguageSwitcher />
+              <Link href="/cart">
+                <a className="relative">
+                  <ShoppingCart className="h-6 w-6" />
+                </a>
               </Link>
-            ) : (
-              <Button size="sm" asChild>
-                <a href={getLoginUrl()}>{t('nav.login', language)}</a>
-              </Button>
-            )}
+              {isAuthenticated ? (
+                <Link href="/account">
+                  <a className="text-sm hover:text-primary">{user?.name || "Account"}</a>
+                </Link>
+              ) : (
+                <Button size="sm" asChild>
+                  <a href={getLoginUrl()}>{t('nav.login', language)}</a>
+                </Button>
+              )}
+            </div>
+            <MobileMenu isAuthenticated={isAuthenticated} userName={user?.name || undefined} />
           </div>
         </div>
       </header>
