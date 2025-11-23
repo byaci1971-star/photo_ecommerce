@@ -3,11 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
+import { t } from "@/lib/i18n";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "wouter";
-import { ShoppingCart, Heart, Award, Truck } from "lucide-react";
+import { ShoppingCart, Heart, Award, Truck, LanguagesIcon } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
   const { data: categories } = trpc.products.getCategories.useQuery();
   const { data: featuredProducts } = trpc.products.getFeatured.useQuery();
 
@@ -30,6 +34,7 @@ export default function Home() {
             ))}
           </nav>
           <div className="flex gap-4 items-center">
+            <LanguageSwitcher />
             <Link href="/cart">
               <a className="relative">
                 <ShoppingCart className="h-6 w-6" />
@@ -41,7 +46,7 @@ export default function Home() {
               </Link>
             ) : (
               <Button size="sm" asChild>
-                <a href={getLoginUrl()}>Login</a>
+                <a href={getLoginUrl()}>{t('nav.login', language)}</a>
               </Button>
             )}
           </div>
@@ -51,11 +56,11 @@ export default function Home() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Create Beautiful Photo Products</h1>
-          <p className="text-lg mb-8 opacity-90">Transform your memories into stunning photo books, calendars, and more</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('home.title', language)}</h1>
+          <p className="text-lg mb-8 opacity-90">{t('home.subtitle', language)}</p>
           <Button size="lg" variant="secondary" asChild>
             <Link href="/products">
-              <a>Start Creating</a>
+              <a>{t('home.cta', language)}</a>
             </Link>
           </Button>
         </div>
@@ -67,23 +72,23 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
               <Award className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <h3 className="font-semibold mb-2">Premium Quality</h3>
-              <p className="text-sm text-gray-600">Award-winning print quality</p>
+              <h3 className="font-semibold mb-2">{t('home.features.quality', language)}</h3>
+              <p className="text-sm text-gray-600">{t('home.features.quality.desc', language)}</p>
             </div>
             <div className="text-center">
               <Truck className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <h3 className="font-semibold mb-2">Fast Shipping</h3>
-              <p className="text-sm text-gray-600">Quick delivery to your door</p>
+              <h3 className="font-semibold mb-2">{t('home.features.shipping', language)}</h3>
+              <p className="text-sm text-gray-600">{t('home.features.shipping.desc', language)}</p>
             </div>
             <div className="text-center">
               <Heart className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <h3 className="font-semibold mb-2">Satisfaction Guaranteed</h3>
-              <p className="text-sm text-gray-600">100% satisfaction promise</p>
+              <h3 className="font-semibold mb-2">{t('home.features.satisfaction', language)}</h3>
+              <p className="text-sm text-gray-600">{t('home.features.satisfaction.desc', language)}</p>
             </div>
             <div className="text-center">
               <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <h3 className="font-semibold mb-2">Easy to Use</h3>
-              <p className="text-sm text-gray-600">Simple design tools</p>
+              <h3 className="font-semibold mb-2">{t('home.features.easy', language)}</h3>
+              <p className="text-sm text-gray-600">{t('home.features.easy.desc', language)}</p>
             </div>
           </div>
         </div>
@@ -92,7 +97,7 @@ export default function Home() {
       {/* Categories Section */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8">Our Products</h2>
+          <h2 className="text-3xl font-bold mb-8">{t('home.our_products', language)}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories?.map((category) => (
               <Link key={category.id} href={`/category/${category.id}`}>
@@ -121,7 +126,7 @@ export default function Home() {
       {featuredProducts && featuredProducts.length > 0 && (
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8">Featured Products</h2>
+            <h2 className="text-3xl font-bold mb-8">{t('home.featured', language)}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProducts.map((product) => (
                 <Link key={product.id} href={`/product/${product.id}`}>
@@ -159,7 +164,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h4 className="font-semibold mb-4">About</h4>
+              <h4 className="font-semibold mb-4">{t('footer.about', language)}</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-primary">About Us</a></li>
                 <li><a href="#" className="hover:text-primary">Sustainability</a></li>
@@ -167,7 +172,7 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
+              <h4 className="font-semibold mb-4">{t('footer.support', language)}</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-primary">Contact</a></li>
                 <li><a href="#" className="hover:text-primary">FAQ</a></li>
@@ -175,7 +180,7 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
+              <h4 className="font-semibold mb-4">{t('footer.legal', language)}</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-primary">Privacy</a></li>
                 <li><a href="#" className="hover:text-primary">Terms</a></li>
@@ -183,7 +188,7 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Follow Us</h4>
+              <h4 className="font-semibold mb-4">{t('footer.follow', language)}</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-primary">Facebook</a></li>
                 <li><a href="#" className="hover:text-primary">Instagram</a></li>
@@ -192,7 +197,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-gray-600">
-            <p>&copy; 2025 {APP_TITLE}. All rights reserved.</p>
+            <p>{t('footer.copyright', language)}</p>
           </div>
         </div>
       </footer>

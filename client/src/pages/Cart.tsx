@@ -5,9 +5,12 @@ import { Link } from "wouter";
 import { ChevronLeft, Trash2 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useEffect, useState } from "react";
+import { t } from "@/lib/i18n";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Cart() {
   const { user, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const { data: cartItems, refetch } = trpc.cart.getItems.useQuery(undefined, {
@@ -154,7 +157,7 @@ export default function Cart() {
                   </div>
                   <Button className="w-full" size="lg" asChild>
                     <Link href="/checkout">
-                      <a>Proceed to Checkout</a>
+                      <a>{t('cart.checkout', language)}</a>
                     </Link>
                   </Button>
                   <Button variant="outline" className="w-full" asChild>

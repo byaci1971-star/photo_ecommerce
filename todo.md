@@ -57,3 +57,28 @@
 ## Deployment
 - [ ] Create checkpoint before publishing
 - [ ] Publish to production
+
+
+## Multilingual Support
+- [x] Create i18n configuration with French, German, English, and Arabic
+- [x] Implement language switcher component
+- [x] Translate all UI text to 4 languages
+- [x] Add RTL support for Arabic
+- [x] Store user language preference in database
+
+## Checkout & Payment
+- [x] Create checkout page with form validation
+- [x] Add shipping address form
+- [x] Implement payment method selection
+- [ ] Integrate Stripe payment processing
+- [ ] Create order confirmation page
+- [ ] Send confirmation email
+
+## User Account & Orders
+- [x] Create user account dashboard
+- [x] Implement order history page
+- [ ] Add order detail view
+- [x] Create user profile page
+- [ ] Add address management
+- [ ] Implement order tracking
+- [ ] Add wishlist functionality
