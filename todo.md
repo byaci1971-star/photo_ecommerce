@@ -82,3 +82,12 @@
 - [ ] Add address management
 - [ ] Implement order tracking
 - [ ] Add wishlist functionality
+
+
+## Navigation & Subcategories
+- [x] Add subcategories table to database schema
+- [x] Create subcategory seed data (photos, books, calendars, gifts with their sizes)
+- [x] Update Category page to show subcategories
+- [x] Create dropdown navigation menu with categories and subcategories
+- [x] Add subcategory filtering to product listing
+- [x] Update product database to link to subcategories

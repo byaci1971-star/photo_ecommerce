@@ -42,11 +42,28 @@ export type Category = typeof categories.$inferSelect;
 export type InsertCategory = typeof categories.$inferInsert;
 
 /**
+ * Product subcategories
+ */
+export const subcategories = mysqlTable("subcategories", {
+  id: int("id").autoincrement().primaryKey(),
+  categoryId: int("categoryId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Subcategory = typeof subcategories.$inferSelect;
+export type InsertSubcategory = typeof subcategories.$inferInsert;
+
+/**
  * Products in the catalog
  */
 export const products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
   categoryId: int("categoryId").notNull(),
+  subcategoryId: int("subcategoryId"),
   name: varchar("name", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
   description: text("description"),

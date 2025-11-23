@@ -8,6 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "wouter";
 import { ShoppingCart, Heart, Award, Truck, LanguagesIcon } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { NavigationMenu } from "@/components/NavigationMenu";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -26,13 +27,7 @@ export default function Home() {
               <span className="font-bold text-lg">{APP_TITLE}</span>
             </a>
           </Link>
-          <nav className="hidden md:flex gap-6">
-            {categories?.map((cat) => (
-              <Link key={cat.id} href={`/category/${cat.id}`}>
-                <a className="text-sm hover:text-primary transition-colors">{cat.name}</a>
-              </Link>
-            ))}
-          </nav>
+          <NavigationMenu />
           <div className="flex gap-4 items-center">
             <LanguageSwitcher />
             <Link href="/cart">

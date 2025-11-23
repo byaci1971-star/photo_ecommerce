@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, products, cartItems, orders, orderItems } from "../drizzle/schema";
+import { InsertUser, users, categories, subcategories, products, cartItems, orders, orderItems } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -102,6 +102,25 @@ export async function getProductsByCategory(categoryId: number) {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(products).where(eq(products.categoryId, categoryId));
+}
+
+export async function getSubcategoriesByCategory(categoryId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(subcategories).where(eq(subcategories.categoryId, categoryId));
+}
+
+export async function getSubcategoryById(subcategoryId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(subcategories).where(eq(subcategories.id, subcategoryId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getProductsBySubcategory(subcategoryId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(products).where(eq(products.subcategoryId, subcategoryId));
 }
 
 export async function getFeaturedProducts(limit = 6) {

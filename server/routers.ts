@@ -25,6 +25,12 @@ export const appRouter = router({
     getByCategory: publicProcedure.input(z.object({ categoryId: z.number() })).query(({ input }) =>
       db.getProductsByCategory(input.categoryId)
     ),
+    getSubcategories: publicProcedure.input(z.object({ categoryId: z.number() })).query(({ input }) =>
+      db.getSubcategoriesByCategory(input.categoryId)
+    ),
+    getBySubcategory: publicProcedure.input(z.object({ subcategoryId: z.number() })).query(({ input }) =>
+      db.getProductsBySubcategory(input.subcategoryId)
+    ),
     getFeatured: publicProcedure.query(() => db.getFeaturedProducts()),
     getById: publicProcedure.input(z.object({ id: z.number() })).query(({ input }) =>
       db.getProductById(input.id)
