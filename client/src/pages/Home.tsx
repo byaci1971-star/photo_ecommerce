@@ -10,6 +10,7 @@ import { ShoppingCart, Heart, Award, Truck, LanguagesIcon } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NavigationMenu } from "@/components/NavigationMenu";
 import { MobileMenu } from "@/components/MobileMenu";
+import { SearchBar } from "@/components/SearchBar";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -29,6 +30,7 @@ export default function Home() {
             </a>
           </Link>
           <NavigationMenu />
+          <SearchBar />
           <div className="flex gap-4 items-center">
             <div className="hidden md:flex gap-4 items-center">
               <LanguageSwitcher />

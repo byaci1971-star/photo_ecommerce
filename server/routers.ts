@@ -45,6 +45,9 @@ export const appRouter = router({
     getById: publicProcedure.input(z.object({ id: z.number() })).query(({ input }) =>
       db.getProductById(input.id)
     ),
+    search: publicProcedure.input(z.object({ query: z.string() })).query(({ input }) =>
+      db.searchProducts(input.query)
+    ),
   }),
 
   // Cart routers

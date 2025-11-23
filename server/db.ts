@@ -139,10 +139,19 @@ export async function getProductById(productId: number) {
 export async function searchProducts(query: string) {
   const db = await getDb();
   if (!db) return [];
-  // Simple search by name or description
-  return await db.select().from(products).where(
-    query ? undefined : undefined
-  );
+  if (!query || query.trim().length === 0) return [];
+  
+  try {
+    // Get all products and filter in memory (simple approach)
+    const allProducts = await db.select().from(products);
+    return allProducts.filter(p => 
+      p.name.toLowerCase().includes(query.toLowerCase()) ||
+      (p.description && p.description.toLowerCase().includes(query.toLowerCase()))
+    );
+  } catch (error) {
+    console.error("Search error:", error);
+    return [];
+  }
 }
 
 /**

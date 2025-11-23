@@ -116,3 +116,11 @@
 - [ ] Handle payment success/failure responses
 - [ ] Update order status after successful payment
 - [ ] Add payment confirmation email
+
+
+## Product Search
+- [x] Implement search procedure in tRPC
+- [x] Create search component for header
+- [x] Add search results page
+- [x] Implement real-time search with debouncing
+- [ ] Add search history (optional)
