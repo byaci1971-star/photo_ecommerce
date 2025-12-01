@@ -9,6 +9,8 @@ import Checkout from "@/pages/Checkout";
 import Account from "@/pages/Account";
 import Subcategory from "@/pages/Subcategory";
 import SearchResults from "@/pages/SearchResults";
+import PhotoConfigurator from "@/pages/PhotoConfigurator";
+import PhotoBookConfigurator from "@/pages/PhotoBookConfigurator";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -24,6 +26,8 @@ function Router() {
       <Route path={"/account"} component={Account} />
       <Route path={"/category/:categoryId/subcategory/:subcategoryId"} component={Subcategory} />
       <Route path={"/search"} component={SearchResults} />
+      <Route path={"/create/photo"} component={PhotoConfigurator} />
+      <Route path={"/create/book"} component={PhotoBookConfigurator} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

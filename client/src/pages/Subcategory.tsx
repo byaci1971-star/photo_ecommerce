@@ -11,6 +11,7 @@ import { NavigationMenu } from "@/components/NavigationMenu";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { ProductFilters, FilterState } from "@/components/ProductFilters";
+import { SearchBar } from "@/components/SearchBar";
 
 export default function Subcategory() {
   const params = useParams();
@@ -75,6 +76,7 @@ export default function Subcategory() {
             </a>
           </Link>
           <NavigationMenu />
+          <SearchBar />
           <div className="flex gap-4 items-center">
             <LanguageSwitcher />
             <Link href="/cart">
@@ -82,14 +84,10 @@ export default function Subcategory() {
                 <ShoppingCart className="h-6 w-6" />
               </a>
             </Link>
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <Link href="/account">
                 <a className="text-sm hover:text-primary">{user?.name || "Account"}</a>
               </Link>
-            ) : (
-              <Button size="sm" asChild>
-                <a href={getLoginUrl()}>{t('nav.login', language)}</a>
-              </Button>
             )}
           </div>
         </div>
@@ -117,16 +115,35 @@ export default function Subcategory() {
               <span>/</span>
             </>
           )}
-          <span className="text-gray-600">{subcategory?.name}</span>
+          <span className="text-gray-600">{subcategory?.name || 'Sous-catégorie'}</span>
         </div>
       </div>
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{subcategory?.name}</h1>
+          <h1 className="text-3xl font-bold mb-2">{subcategory?.name || 'Produits'}</h1>
           {subcategory?.description && (
             <p className="text-gray-600">{subcategory.description}</p>
+          )}
+          {/* Create Custom Product Button */}
+          {categoryId === 1 && (
+            <div className="mt-4">
+              <Link href="/create/photo">
+                <a className="inline-block">
+                  <Button className="bg-purple-600 hover:bg-purple-700">Créer mes photos personnalisées</Button>
+                </a>
+              </Link>
+            </div>
+          )}
+          {categoryId === 2 && (
+            <div className="mt-4">
+              <Link href="/create/book">
+                <a className="inline-block">
+                  <Button className="bg-purple-600 hover:bg-purple-700">Créer mon livre photo</Button>
+                </a>
+              </Link>
+            </div>
           )}
         </div>
 

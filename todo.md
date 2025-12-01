@@ -124,3 +124,15 @@
 - [x] Add search results page
 - [x] Implement real-time search with debouncing
 - [ ] Add search history (optional)
+
+
+## Product Configurators & Customization
+- [x] Create photo print configurator page with image upload
+- [x] Create photo book configurator page
+- [ ] Create calendar configurator page
+- [ ] Create gift item configurator page
+- [ ] Implement image upload to S3 storage
+- [x] Add customization options (size, format, finish, pages, cover type)
+- [ ] Update shopping cart to support custom products
+- [ ] Implement product preview functionality
+- [ ] Create custom product database procedures

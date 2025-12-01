@@ -145,3 +145,91 @@ export const productAttributes = mysqlTable("productAttributes", {
 
 export type ProductAttribute = typeof productAttributes.$inferSelect;
 export type InsertProductAttribute = typeof productAttributes.$inferInsert;
+
+/**
+ * Custom photo products (photos, books, calendars, gifts)
+ */
+export const customProducts = mysqlTable("customProducts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // 'photo', 'book', 'calendar', 'gift'
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  basePrice: int("basePrice").notNull(), // Price in cents
+  customizationOptions: text("customizationOptions"), // JSON string with selected options
+  uploadedImages: text("uploadedImages"), // JSON array of image URLs
+  previewImage: varchar("previewImage", { length: 512 }),
+  status: varchar("status", { length: 50 }).default("draft").notNull(), // 'draft', 'ready', 'ordered'
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CustomProduct = typeof customProducts.$inferSelect;
+export type InsertCustomProduct = typeof customProducts.$inferInsert;
+
+/**
+ * Photo print options
+ */
+export const photoPrintOptions = mysqlTable("photoPrintOptions", {
+  id: int("id").autoincrement().primaryKey(),
+  customProductId: int("customProductId").notNull(),
+  size: varchar("size", { length: 50 }).notNull(), // '10x15', '13x18', '20x25', etc.
+  finish: varchar("finish", { length: 50 }).notNull(), // 'glossy', 'matte', 'satin'
+  quantity: int("quantity").notNull(),
+  pricePerUnit: int("pricePerUnit").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PhotoPrintOption = typeof photoPrintOptions.$inferSelect;
+export type InsertPhotoPrintOption = typeof photoPrintOptions.$inferInsert;
+
+/**
+ * Photo book options
+ */
+export const photoBookOptions = mysqlTable("photoBookOptions", {
+  id: int("id").autoincrement().primaryKey(),
+  customProductId: int("customProductId").notNull(),
+  size: varchar("size", { length: 50 }).notNull(), // 'A5', 'A4', 'A3'
+  pages: int("pages").notNull(),
+  cover: varchar("cover", { length: 50 }).notNull(), // 'softcover', 'hardcover'
+  binding: varchar("binding", { length: 50 }).notNull(), // 'perfect', 'spiral'
+  pricePerBook: int("pricePerBook").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PhotoBookOption = typeof photoBookOptions.$inferSelect;
+export type InsertPhotoBookOption = typeof photoBookOptions.$inferInsert;
+
+/**
+ * Calendar options
+ */
+export const calendarOptions = mysqlTable("calendarOptions", {
+  id: int("id").autoincrement().primaryKey(),
+  customProductId: int("customProductId").notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // 'wall', 'desk', 'pocket'
+  size: varchar("size", { length: 50 }).notNull(),
+  year: int("year").notNull(),
+  language: varchar("language", { length: 10 }).notNull(), // 'fr', 'de', 'en', 'ar'
+  pricePerCalendar: int("pricePerCalendar").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CalendarOption = typeof calendarOptions.$inferSelect;
+export type InsertCalendarOption = typeof calendarOptions.$inferInsert;
+
+/**
+ * Gift item options
+ */
+export const giftOptions = mysqlTable("giftOptions", {
+  id: int("id").autoincrement().primaryKey(),
+  customProductId: int("customProductId").notNull(),
+  itemType: varchar("itemType", { length: 50 }).notNull(), // 'mug', 'tshirt', 'cushion', 'keychain'
+  color: varchar("color", { length: 50 }).notNull(),
+  size: varchar("size", { length: 50 }),
+  material: varchar("material", { length: 50 }),
+  pricePerItem: int("pricePerItem").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type GiftOption = typeof giftOptions.$inferSelect;
+export type InsertGiftOption = typeof giftOptions.$inferInsert;
