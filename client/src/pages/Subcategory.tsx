@@ -145,6 +145,24 @@ export default function Subcategory() {
               </Link>
             </div>
           )}
+          {categoryId === 3 && (
+            <div className="mt-4">
+              <Link href="/create/calendar">
+                <a className="inline-block">
+                  <Button className="bg-purple-600 hover:bg-purple-700">Créer mon calendrier</Button>
+                </a>
+              </Link>
+            </div>
+          )}
+          {categoryId === 4 && (
+            <div className="mt-4">
+              <Link href="/create/gift">
+                <a className="inline-block">
+                  <Button className="bg-purple-600 hover:bg-purple-700">Créer mon cadeau</Button>
+                </a>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Products with Filters */}
