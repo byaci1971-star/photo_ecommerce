@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'wouter';
@@ -10,39 +10,66 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SearchBar } from '@/components/SearchBar';
 import { APP_LOGO, APP_TITLE, getLoginUrl } from '@/const';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import { trpc } from '@/lib/trpc';
 
 export default function PhotoConfigurator() {
   const { user, isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [localImages, setLocalImages] = useState<string[]>([]);
   const [selectedSize, setSelectedSize] = useState('10x15');
   const [selectedFinish, setSelectedFinish] = useState('glossy');
-  const [quantity, setQuantity] = useState(1);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const quantity = selectedQuantity;
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const { uploadImages, isUploading, error: uploadError, uploadedUrls } = useImageUpload('photo');
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (uploadedUrls.length > 0) {
+      setUploadedImages(uploadedUrls);
+    }
+  }, [uploadedUrls]);
 
   const sizes = ['10x15 cm', '13x18 cm', '20x25 cm', '21x30 cm (A4)', '30x40 cm'];
   const finishes = ['Glossy', 'Matte', 'Satin'];
   const pricePerUnit = 299; // CHF 2.99
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            setUploadedImages([...uploadedImages, event.target.result as string]);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      try {
+        // First, create local previews
+        const previews: string[] = [];
+        for (const file of Array.from(files)) {
+          const reader = new FileReader();
+          await new Promise<void>((resolve) => {
+            reader.onload = (event) => {
+              if (event.target?.result) {
+                previews.push(event.target.result as string);
+              }
+              resolve();
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+        setLocalImages([...localImages, ...previews]);
+        
+        // Then upload to S3
+        setMessage({ type: 'success', text: 'Téléchargement en cours...' });
+        const urls = await uploadImages(Array.from(files));
+        setUploadedImages([...uploadedImages, ...urls]);
+        setMessage({ type: 'success', text: 'Images téléchargées avec succès!' });
+      } catch (error) {
+        setMessage({ type: 'error', text: 'Erreur lors du téléchargement' });
+      }
     }
   };
 
   const handleRemoveImage = (index: number) => {
     setUploadedImages(uploadedImages.filter((_, i) => i !== index));
+    setLocalImages(localImages.filter((_, i) => i !== index));
   };
 
   const handleAddToCart = async () => {
@@ -53,6 +80,11 @@ export default function PhotoConfigurator() {
 
     if (uploadedImages.length === 0) {
       setMessage({ type: 'error', text: 'Veuillez télécharger au moins une image' });
+      return;
+    }
+
+    if (isUploading) {
+      setMessage({ type: 'error', text: 'Veuillez attendre la fin du téléchargement' });
       return;
     }
 
@@ -167,7 +199,7 @@ export default function PhotoConfigurator() {
                   <div>
                     <p className="font-medium mb-3">Images téléchargées ({uploadedImages.length})</p>
                     <div className="grid grid-cols-3 gap-4">
-                      {uploadedImages.map((image, index) => (
+                      {localImages.map((image, index) => (
                         <div key={index} className="relative group">
                           <img
                             src={image}
@@ -239,14 +271,14 @@ export default function PhotoConfigurator() {
                   <label className="block font-medium mb-3">Quantité par image</label>
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      onClick={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
                       className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                     >
                       −
                     </button>
-                    <span className="text-xl font-bold w-12 text-center">{quantity}</span>
+                    <span className="text-xl font-bold w-12 text-center">{selectedQuantity}</span>
                     <button
-                      onClick={() => setQuantity(quantity + 1)}
+                      onClick={() => setSelectedQuantity(selectedQuantity + 1)}
                       className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                     >
                       +
@@ -297,11 +329,11 @@ export default function PhotoConfigurator() {
 
                   <Button
                     onClick={handleAddToCart}
-                    disabled={uploadedImages.length === 0}
+                    disabled={uploadedImages.length === 0 || isUploading}
                     className="w-full bg-purple-600 hover:bg-purple-700"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Ajouter au panier
+                    {isUploading ? 'Téléchargement...' : 'Ajouter au panier'}
                   </Button>
                 </div>
               </CardContent>

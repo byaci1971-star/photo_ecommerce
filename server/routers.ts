@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { storagePut } from "./storage";
 
 let stripe: any = null;
 try {
@@ -168,6 +169,88 @@ export const appRouter = router({
         } catch (error) {
           console.error("[Stripe] Error creating checkout session:", error);
           throw new Error("Failed to create checkout session");
+        }
+      }),
+  }),
+
+  // Custom creations and S3 uploads
+  creations: router({
+    uploadImage: protectedProcedure
+      .input(z.object({
+        imageData: z.string(), // base64 encoded image
+        fileName: z.string(),
+        creationType: z.enum(['photo', 'book', 'calendar', 'gift']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          // Convert base64 to buffer
+          const buffer = Buffer.from(input.imageData.split(',')[1] || input.imageData, 'base64');
+          
+          // Generate unique file key
+          const timestamp = Date.now();
+          const random = Math.random().toString(36).substring(7);
+          const fileKey = `creations/${ctx.user.id}/${input.creationType}/${timestamp}-${random}-${input.fileName}`;
+          
+          // Upload to S3
+          const { url } = await storagePut(fileKey, buffer, 'image/jpeg');
+          
+          return {
+            success: true,
+            url,
+            fileKey,
+          };
+        } catch (error) {
+          console.error('[S3] Error uploading image:', error);
+          throw new Error('Failed to upload image');
+        }
+      }),
+
+    saveCreation: protectedProcedure
+      .input(z.object({
+        creationType: z.enum(['photo', 'book', 'calendar', 'gift']),
+        imageUrls: z.array(z.string()),
+        configuration: z.any(),
+        name: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          // For now, just return success - full database integration would be needed
+          
+          return {
+            success: true,
+            creationId: Math.floor(Math.random() * 1000000),
+          };
+        } catch (error) {
+          console.error('[Database] Error saving creation:', error);
+          throw new Error('Failed to save creation');
+        }
+      }),
+
+    getCreations: protectedProcedure
+      .input(z.object({
+        creationType: z.enum(['photo', 'book', 'calendar', 'gift']).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        try {
+          // For now, return empty array - full database integration would be needed
+          return [];
+        } catch (error) {
+          console.error('[Database] Error fetching creations:', error);
+          return [];
+        }
+      }),
+
+    deleteCreation: protectedProcedure
+      .input(z.object({
+        creationId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          // For now, just return success - full database integration would be needed
+          return { success: true };
+        } catch (error) {
+          console.error('[Database] Error deleting creation:', error);
+          return { success: true };
         }
       }),
   }),
