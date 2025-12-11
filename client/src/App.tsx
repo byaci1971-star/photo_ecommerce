@@ -14,6 +14,7 @@ import PhotoBookConfigurator from "@/pages/PhotoBookConfigurator";
 import CalendarConfigurator from "@/pages/CalendarConfigurator";
 import GiftConfigurator from "@/pages/GiftConfigurator";
 import Studio from "@/pages/Studio";
+import StudioEditor from "@/pages/StudioEditor";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -34,6 +35,7 @@ function Router() {
       <Route path={"/create/calendar"} component={CalendarConfigurator} />
       <Route path={"/create/gift"} component={GiftConfigurator} />
       <Route path={"/studio"} component={Studio} />
+      <Route path={"/studio/editor/:projectId"} component={StudioEditor} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
