@@ -78,3 +78,12 @@
 - [x] Implement real-time preview updates
 - [x] Add download preview as image
 - [x] Create fullscreen preview mode
+
+
+## Direct Product Creation from Product Pages
+- [x] Add "Create Custom" button on product detail pages
+- [x] Add "Create Custom" button on product listing pages
+- [x] Create workflow to launch editor from product pages
+- [ ] Pass product type/category to editor
+- [ ] Add "Add to Cart" button after creation
+- [ ] Implement quick create modal for fast creation

@@ -209,6 +209,13 @@ export default function Subcategory() {
                           )}
                         </div>
                       </div>
+                      <Link href={`/studio?productId=${product.id}`}>
+                        <a className="block mb-2">
+                          <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                            ✨ Create
+                          </Button>
+                        </a>
+                      </Link>
                       <Button
                         className="w-full"
                         onClick={() => handleAddToCart(product.id)}

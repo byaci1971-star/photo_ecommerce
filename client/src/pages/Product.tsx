@@ -140,6 +140,17 @@ export default function Product() {
                 </div>
               </div>
 
+              <Link href={`/studio?productId=${productId}`}>
+                <a className="block">
+                  <Button
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  >
+                    ✨ Create Custom Product
+                  </Button>
+                </a>
+              </Link>
+
               <Button
                 size="lg"
                 className="w-full"
