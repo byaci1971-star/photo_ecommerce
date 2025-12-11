@@ -10,6 +10,8 @@ import { EditorToolbar } from '@/components/EditorToolbar';
 import { PropertiesPanel } from '@/components/PropertiesPanel';
 import { FilterPanel } from '@/components/FilterPanel';
 import { ExportPdfDialog } from '@/components/ExportPdfDialog';
+import { HighResolutionPreview } from '@/components/HighResolutionPreview';
+import { BeforeAfterComparison } from '@/components/BeforeAfterComparison';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -23,6 +25,9 @@ export default function StudioEditor() {
   const { language } = useLanguage();
   const [fileName, setFileName] = useState('');
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
+  const [originalCanvasImage, setOriginalCanvasImage] = useState<string | null>(null);
 
   const projectQuery = trpc.projects.getById.useQuery(
     { projectId: Number(projectId) },
@@ -198,6 +203,10 @@ export default function StudioEditor() {
               <Download className="w-4 h-4 mr-2" />
               Export PDF
             </Button>
+            <Button onClick={() => setShowPreview(true)} variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              Preview
+            </Button>
           </div>
         </div>
 
@@ -259,6 +268,26 @@ export default function StudioEditor() {
         onExport={handleExportPdf}
         fileName={projectQuery.data?.name || 'creation'}
       />
+
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold">High Resolution Preview</h2>
+              <button onClick={() => setShowPreview(false)} className="text-gray-500 hover:text-gray-700 text-2xl">
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <HighResolutionPreview
+                canvasRef={editor.canvasRef as React.RefObject<HTMLCanvasElement>}
+                projectName={projectQuery.data?.name || 'creation'}
+                onDownload={handleExportImage}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
