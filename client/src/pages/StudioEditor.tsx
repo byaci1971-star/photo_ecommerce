@@ -7,6 +7,7 @@ import { useCanvasEditor } from '@/hooks/useCanvasEditor';
 import { Canvas } from '@/components/Canvas';
 import { EditorToolbar } from '@/components/EditorToolbar';
 import { PropertiesPanel } from '@/components/PropertiesPanel';
+import { FilterPanel } from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -213,8 +214,16 @@ export default function StudioEditor() {
             />
           </div>
 
-          <div className="w-64">
+          <div className="w-80 space-y-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
             <PropertiesPanel
+              element={selectedElement}
+              onUpdate={(updates) => {
+                if (editor.selectedElementId) {
+                  editor.updateElement(editor.selectedElementId, updates);
+                }
+              }}
+            />
+            <FilterPanel
               element={selectedElement}
               onUpdate={(updates) => {
                 if (editor.selectedElementId) {

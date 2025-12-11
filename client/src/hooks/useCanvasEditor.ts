@@ -12,6 +12,13 @@ export interface CanvasElement {
   zIndex: number;
   // Image specific
   src?: string;
+  brightness?: number;
+  contrast?: number;
+  saturation?: number;
+  hue?: number;
+  blur?: number;
+  grayscale?: number;
+  sepia?: number;
   // Text specific
   text?: string;
   fontSize?: number;

@@ -51,7 +51,11 @@ export function Canvas({
       if (element.type === 'image' && element.src) {
         const img = new Image();
         img.onload = () => {
+          // Apply filters using canvas filter property
+          const filterString = getFilterString(element);
+          ctx.filter = filterString;
           ctx.drawImage(img, element.x, element.y, element.width, element.height);
+          ctx.filter = 'none';
           drawSelectionBox(ctx, element, selectedElementId);
         };
         img.src = element.src;
@@ -126,6 +130,34 @@ export function Canvas({
       />
     </div>
   );
+}
+
+function getFilterString(element: CanvasElement): string {
+  const filters: string[] = [];
+
+  if (element.brightness !== undefined && element.brightness !== 0) {
+    filters.push(`brightness(${100 + element.brightness}%)`);
+  }
+  if (element.contrast !== undefined && element.contrast !== 0) {
+    filters.push(`contrast(${100 + element.contrast}%)`);
+  }
+  if (element.saturation !== undefined && element.saturation !== 0) {
+    filters.push(`saturate(${100 + element.saturation}%)`);
+  }
+  if (element.hue !== undefined && element.hue !== 0) {
+    filters.push(`hue-rotate(${element.hue}deg)`);
+  }
+  if (element.blur !== undefined && element.blur !== 0) {
+    filters.push(`blur(${element.blur}px)`);
+  }
+  if (element.grayscale !== undefined && element.grayscale !== 0) {
+    filters.push(`grayscale(${element.grayscale}%)`);
+  }
+  if (element.sepia !== undefined && element.sepia !== 0) {
+    filters.push(`sepia(${element.sepia}%)`);
+  }
+
+  return filters.length > 0 ? filters.join(' ') : 'none';
 }
 
 function drawSelectionBox(ctx: CanvasRenderingContext2D, element: CanvasElement, selectedId: string | null) {
