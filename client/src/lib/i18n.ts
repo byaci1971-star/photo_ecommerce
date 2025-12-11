@@ -360,3 +360,6 @@ export function t(key: string, language: Language, params?: Record<string, strin
   
   return text;
 }
+
+// Add studio translations to existing language objects
+// This will be merged with the existing translations object

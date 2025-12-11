@@ -36,6 +36,13 @@
       "when": 1764626566798,
       "tag": "0004_workable_imperial_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1765450193443,
+      "tag": "0005_square_multiple_man",
+      "breakpoints": true
     }
   ]
 }

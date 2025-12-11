@@ -1,6 +1,6 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, or, like, desc, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, subcategories, products, cartItems, orders, orderItems, productAttributes } from "../drizzle/schema";
+import { InsertUser, users, categories, subcategories, products, cartItems, orders, orderItems, productAttributes, projects, projectImages, projectElements } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -282,4 +282,126 @@ export async function getUserByStripeCustomerId(stripeCustomerId: string) {
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.stripeCustomerId, stripeCustomerId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
+}
+
+
+/**
+ * Project queries
+ */
+export async function createProject(userId: number, name: string, projectType: string, description?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(projects).values({
+    userId,
+    name,
+    projectType,
+    description,
+    status: "draft",
+  });
+  
+  return result;
+}
+
+export async function getUserProjects(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(projects).where(eq(projects.userId, userId)).orderBy(desc(projects.updatedAt));
+}
+
+export async function getProjectById(projectId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projects)
+    .where(and(eq(projects.id, projectId), eq(projects.userId, userId)))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateProject(projectId: number, userId: number, updates: { name?: string; description?: string; data?: string; status?: string; thumbnailUrl?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.update(projects)
+    .set(updates)
+    .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+}
+
+export async function deleteProject(projectId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Delete related images and elements first
+  await db.delete(projectImages).where(eq(projectImages.projectId, projectId));
+  await db.delete(projectElements).where(eq(projectElements.projectId, projectId));
+  
+  // Delete the project
+  return await db.delete(projects)
+    .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+}
+
+/**
+ * Project image queries
+ */
+export async function addProjectImage(projectId: number, imageUrl: string, originalFileName?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.insert(projectImages).values({
+    projectId,
+    imageUrl,
+    originalFileName,
+  });
+}
+
+export async function getProjectImages(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(projectImages).where(eq(projectImages.projectId, projectId));
+}
+
+export async function deleteProjectImage(imageId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.delete(projectImages).where(eq(projectImages.id, imageId));
+}
+
+/**
+ * Project element queries
+ */
+export async function addProjectElement(projectId: number, elementType: string, elementData: string, zIndex: number = 0) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.insert(projectElements).values({
+    projectId,
+    elementType,
+    elementData,
+    zIndex,
+  });
+}
+
+export async function getProjectElements(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(projectElements)
+    .where(eq(projectElements.projectId, projectId))
+    .orderBy(asc(projectElements.zIndex));
+}
+
+export async function updateProjectElement(elementId: number, elementData: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.update(projectElements)
+    .set({ elementData })
+    .where(eq(projectElements.id, elementId));
+}
+
+export async function deleteProjectElement(elementId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.delete(projectElements).where(eq(projectElements.id, elementId));
 }

@@ -254,6 +254,185 @@ export const appRouter = router({
         }
       }),
   }),
+
+  // Studio projects router
+  projects: router({
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        projectType: z.enum(['photo', 'book', 'calendar', 'gift']),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const result = await db.createProject(
+            ctx.user.id,
+            input.name,
+            input.projectType,
+            input.description
+          );
+          return { success: true, projectId: (result as any).insertId || 0 };
+        } catch (error) {
+          console.error('[Projects] Error creating project:', error);
+          throw new Error('Failed to create project');
+        }
+      }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      try {
+        return await db.getUserProjects(ctx.user.id);
+      } catch (error) {
+        console.error('[Projects] Error listing projects:', error);
+        return [];
+      }
+    }),
+
+    getById: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          return await db.getProjectById(input.projectId, ctx.user.id);
+        } catch (error) {
+          console.error('[Projects] Error getting project:', error);
+          return null;
+        }
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        name: z.string().optional(),
+        description: z.string().optional(),
+        data: z.string().optional(),
+        status: z.enum(['draft', 'completed', 'archived']).optional(),
+        thumbnailUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const { projectId, ...updates } = input;
+          await db.updateProject(projectId, ctx.user.id, updates);
+          return { success: true };
+        } catch (error) {
+          console.error('[Projects] Error updating project:', error);
+          throw new Error('Failed to update project');
+        }
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await db.deleteProject(input.projectId, ctx.user.id);
+          return { success: true };
+        } catch (error) {
+          console.error('[Projects] Error deleting project:', error);
+          throw new Error('Failed to delete project');
+        }
+      }),
+
+    addImage: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        imageUrl: z.string(),
+        originalFileName: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const result = await db.addProjectImage(
+            input.projectId,
+            input.imageUrl,
+            input.originalFileName
+          );
+          return { success: true, imageId: (result as any).insertId || 0 };
+        } catch (error) {
+          console.error('[Projects] Error adding image:', error);
+          throw new Error('Failed to add image');
+        }
+      }),
+
+    getImages: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          return await db.getProjectImages(input.projectId);
+        } catch (error) {
+          console.error('[Projects] Error getting images:', error);
+          return [];
+        }
+      }),
+
+    deleteImage: protectedProcedure
+      .input(z.object({ imageId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await db.deleteProjectImage(input.imageId);
+          return { success: true };
+        } catch (error) {
+          console.error('[Projects] Error deleting image:', error);
+          throw new Error('Failed to delete image');
+        }
+      }),
+
+    addElement: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        elementType: z.string(),
+        elementData: z.string(),
+        zIndex: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const result = await db.addProjectElement(
+            input.projectId,
+            input.elementType,
+            input.elementData,
+            input.zIndex || 0
+          );
+          return { success: true, elementId: (result as any).insertId || 0 };
+        } catch (error) {
+          console.error('[Projects] Error adding element:', error);
+          throw new Error('Failed to add element');
+        }
+      }),
+
+    getElements: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          return await db.getProjectElements(input.projectId);
+        } catch (error) {
+          console.error('[Projects] Error getting elements:', error);
+          return [];
+        }
+      }),
+
+    updateElement: protectedProcedure
+      .input(z.object({
+        elementId: z.number(),
+        elementData: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await db.updateProjectElement(input.elementId, input.elementData);
+          return { success: true };
+        } catch (error) {
+          console.error('[Projects] Error updating element:', error);
+          throw new Error('Failed to update element');
+        }
+      }),
+
+    deleteElement: protectedProcedure
+      .input(z.object({ elementId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await db.deleteProjectElement(input.elementId);
+          return { success: true };
+        } catch (error) {
+          console.error('[Projects] Error deleting element:', error);
+          throw new Error('Failed to delete element');
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

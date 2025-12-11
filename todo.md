@@ -1,142 +1,72 @@
 # Photo E-Commerce Platform - TODO
 
 ## Core Features
-- [x] Product catalog with categories (photo books, calendars, photos, wall decorations, greeting cards, gifts)
-- [x] Product detail page with images and descriptions
-- [x] Shopping cart functionality
-- [ ] Checkout process
-- [ ] Order management system
-- [ ] Payment integration (Stripe)
-- [ ] User account and order history
-- [ ] Product search and filtering
-- [x] Responsive design for mobile and desktop
+- [x] Product catalog with categories and subcategories
+- [x] Product filtering by price, size, color
+- [x] Product search functionality
+- [x] Multilingual support (FR, DE, EN, AR)
+- [x] User authentication and account management
+- [x] Order history and tracking
+- [x] Navigation menu with dropdown categories
 
-## Design & Layout
-- [x] Homepage with hero section and featured products
-- [x] Navigation menu with product categories
-- [x] Product listing page with grid layout
-- [x] Shopping cart page
-- [ ] Checkout page
-- [ ] User account dashboard
-- [ ] Order confirmation page
+## Studio de Création (Workspace)
+- [x] Create workspace/studio page
+- [x] Add products to workspace (photos, books, calendars, gifts)
+- [x] Display workspace with selected products
+- [x] Create project management system
+- [x] Add project save/load functionality
 
-## Database Schema
-- [x] Products table
-- [x] Categories table
-- [x] Cart items table
-- [x] Orders table
-- [x] Order items table
+## Visual Editor
+- [ ] Create canvas/editor component
+- [ ] Implement image upload to editor
+- [ ] Add image cropping tool
+- [ ] Add image rotation tool
+- [ ] Add color adjustment tools (brightness, contrast, saturation)
+- [ ] Implement text editor for adding text to products
+- [ ] Add text styling options (font, size, color)
+- [ ] Create real-time preview of final product
+- [ ] Implement undo/redo functionality
 
-## Backend APIs (tRPC procedures)
-- [x] Get all products
-- [x] Get product by ID
-- [x] Get products by category
-- [ ] Search products
-- [x] Add to cart
-- [x] Remove from cart
-- [x] Get cart items
-- [ ] Create order
-- [ ] Get user orders
-- [ ] Get order details
+## Photo Book Editor
+- [ ] Create multi-page layout system
+- [ ] Implement drag-and-drop for photo placement
+- [ ] Add page management (add/remove pages)
+- [ ] Create text editor for book pages
+- [ ] Implement page preview
 
-## Frontend Pages
-- [x] Home page
-- [x] Product listing page
-- [x] Product detail page
-- [x] Shopping cart page
-- [ ] Checkout page
-- [ ] Order confirmation page
-- [ ] User account page
-- [ ] Order history page
+## Calendar Editor
+- [ ] Create 12-month calendar layout
+- [ ] Implement photo placement for each month
+- [ ] Add date picker and date display
+- [ ] Create calendar preview
+
+## Project Management
+- [ ] Create projects table in database
+- [ ] Implement save project procedure
+- [ ] Implement load project procedure
+- [ ] Implement delete project procedure
+- [ ] Add project list page
+- [ ] Create project metadata (name, type, created date, modified date)
+
+## Export & PDF
+- [ ] Implement PDF generation library integration
+- [ ] Create PDF export for photos
+- [ ] Create PDF export for photo books
+- [ ] Create PDF export for calendars
+- [ ] Add print-ready PDF options
+- [ ] Implement high-resolution preview
+- [ ] Add download functionality
+
+## UI/UX
+- [ ] Create workspace layout with sidebar
+- [ ] Implement editor toolbar
+- [ ] Add canvas/preview area
+- [ ] Create project panel
+- [ ] Add status indicators
+- [ ] Implement responsive design for editor
 
 ## Testing
-- [x] Unit tests for tRPC procedures
-- [ ] Integration tests for checkout flow
-- [ ] Component tests for UI elements
-
-## Deployment
-- [ ] Create checkpoint before publishing
-- [ ] Publish to production
-
-
-## Multilingual Support
-- [x] Create i18n configuration with French, German, English, and Arabic
-- [x] Implement language switcher component
-- [x] Translate all UI text to 4 languages
-- [x] Add RTL support for Arabic
-- [x] Store user language preference in database
-
-## Checkout & Payment
-- [x] Create checkout page with form validation
-- [x] Add shipping address form
-- [x] Implement payment method selection
-- [ ] Integrate Stripe payment processing
-- [ ] Create order confirmation page
-- [ ] Send confirmation email
-
-## User Account & Orders
-- [x] Create user account dashboard
-- [x] Implement order history page
-- [ ] Add order detail view
-- [x] Create user profile page
-- [ ] Add address management
-- [ ] Implement order tracking
-- [ ] Add wishlist functionality
-
-
-## Navigation & Subcategories
-- [x] Add subcategories table to database schema
-- [x] Create subcategory seed data (photos, books, calendars, gifts with their sizes)
-- [x] Update Category page to show subcategories
-- [x] Create dropdown navigation menu with categories and subcategories
-- [x] Add subcategory filtering to product listing
-- [x] Update product database to link to subcategories
-
-
-## Mobile Menu & Responsive Navigation
-- [x] Create mobile hamburger menu component
-- [x] Implement responsive sidebar navigation
-- [x] Add mobile menu toggle functionality
-- [x] Test responsive design on mobile devices
-
-## Product Filtering
-- [x] Add product attributes table (size, color, material)
-- [x] Create filter UI component
-- [x] Implement price range filter
-- [x] Implement size/format filter
-- [x] Implement color filter
-- [x] Add filter state management
-- [x] Update product listing to apply filters
-
-## Stripe Payment Integration
-- [x] Add Stripe API keys to environment
-- [x] Create Stripe payment intent procedure
-- [x] Implement Stripe Elements on checkout page
-- [x] Add payment form validation
-- [ ] Handle payment success/failure responses
-- [ ] Update order status after successful payment
-- [ ] Add payment confirmation email
-
-
-## Product Search
-- [x] Implement search procedure in tRPC
-- [x] Create search component for header
-- [x] Add search results page
-- [x] Implement real-time search with debouncing
-- [ ] Add search history (optional)
-
-
-## Product Configurators & Customization
-- [x] Create photo print configurator page with image upload
-- [x] Create photo book configurator page
-- [x] Create calendar configurator page
-- [x] Create gift item configurator page
-- [x] Implement image upload to S3 storage
-- [x] Create useImageUpload hook for client-side upload
-- [x] Integrate S3 upload in PhotoConfigurator
-- [x] Fix and test all upload procedures
-- [x] Create comprehensive unit tests for creations router
-- [x] Add customization options (size, format, finish, pages, cover type)
-- [ ] Update shopping cart to support custom products
-- [ ] Implement product preview functionality
-- [ ] Create custom product database procedures
+- [ ] Write tests for workspace procedures
+- [ ] Write tests for project management
+- [ ] Write tests for editor functionality
+- [ ] Integration tests for full workflow

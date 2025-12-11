@@ -233,3 +233,53 @@ export const giftOptions = mysqlTable("giftOptions", {
 
 export type GiftOption = typeof giftOptions.$inferSelect;
 export type InsertGiftOption = typeof giftOptions.$inferInsert;
+
+
+/**
+ * Studio projects - user's creative workspace projects
+ */
+export const projects = mysqlTable("projects", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  projectType: varchar("projectType", { length: 50 }).notNull(), // 'photo', 'book', 'calendar', 'gift'
+  thumbnailUrl: varchar("thumbnailUrl", { length: 512 }),
+  data: text("data"), // JSON stringified project data
+  status: varchar("status", { length: 50 }).default("draft").notNull(), // 'draft', 'completed', 'archived'
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
+
+/**
+ * Project images - images used in projects
+ */
+export const projectImages = mysqlTable("projectImages", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  imageUrl: varchar("imageUrl", { length: 512 }).notNull(),
+  originalFileName: varchar("originalFileName", { length: 255 }),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+});
+
+export type ProjectImage = typeof projectImages.$inferSelect;
+export type InsertProjectImage = typeof projectImages.$inferInsert;
+
+/**
+ * Project elements - individual elements within a project (text, images, etc)
+ */
+export const projectElements = mysqlTable("projectElements", {
+  id: int("id").autoincrement().primaryKey(),
+  projectId: int("projectId").notNull(),
+  elementType: varchar("elementType", { length: 50 }).notNull(), // 'image', 'text', 'shape'
+  elementData: text("elementData").notNull(), // JSON stringified element properties
+  zIndex: int("zIndex").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProjectElement = typeof projectElements.$inferSelect;
+export type InsertProjectElement = typeof projectElements.$inferInsert;
