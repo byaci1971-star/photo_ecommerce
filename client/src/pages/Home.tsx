@@ -60,7 +60,7 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('home.title', language)}</h1>
           <p className="text-lg mb-8 opacity-90">{t('home.subtitle', language)}</p>
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/products">
+            <Link href="/studio">
               <a>{t('home.cta', language)}</a>
             </Link>
           </Button>
