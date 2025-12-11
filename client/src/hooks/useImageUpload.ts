@@ -24,23 +24,10 @@ export function useImageUpload(creationType: 'photo' | 'book' | 'calendar' | 'gi
       for (const file of files) {
         const reader = new FileReader();
         
-        await new Promise<void>((resolve, reject) => {
-          reader.onload = async (e) => {
-            try {
-              const imageData = e.target?.result as string;
-              const result = await uploadMutation.mutateAsync({
-                imageData,
-                fileName: file.name,
-                creationType,
-              });
-              
-              if (result.success) {
-                uploadedUrls.push(result.url);
-              }
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
+        const imageData = await new Promise<string>((resolve, reject) => {
+          reader.onload = (e) => {
+            const result = e.target?.result as string;
+            resolve(result);
           };
           
           reader.onerror = () => {
@@ -49,6 +36,21 @@ export function useImageUpload(creationType: 'photo' | 'book' | 'calendar' | 'gi
           
           reader.readAsDataURL(file);
         });
+
+        try {
+          const result = await uploadMutation.mutateAsync({
+            imageData,
+            fileName: file.name,
+            creationType,
+          });
+          
+          if (result.success) {
+            uploadedUrls.push(result.url);
+          }
+        } catch (uploadError) {
+          console.error(`Failed to upload ${file.name}:`, uploadError);
+          throw uploadError;
+        }
       }
 
       setProgress({
@@ -74,9 +76,9 @@ export function useImageUpload(creationType: 'photo' | 'book' | 'calendar' | 'gi
     configuration: Record<string, any>,
     name?: string
   ) => {
+    const saveMutation = trpc.creations.saveCreation.useMutation();
     try {
-      const result = await trpc.creations.saveCreation.useMutation();
-      return await result.mutateAsync({
+      return await saveMutation.mutateAsync({
         creationType,
         imageUrls,
         configuration,

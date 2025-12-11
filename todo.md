@@ -134,6 +134,8 @@
 - [x] Implement image upload to S3 storage
 - [x] Create useImageUpload hook for client-side upload
 - [x] Integrate S3 upload in PhotoConfigurator
+- [x] Fix and test all upload procedures
+- [x] Create comprehensive unit tests for creations router
 - [x] Add customization options (size, format, finish, pages, cover type)
 - [ ] Update shopping cart to support custom products
 - [ ] Implement product preview functionality
