@@ -4,10 +4,12 @@ import { useAuth } from '@/_core/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trpc } from '@/lib/trpc';
 import { useCanvasEditor } from '@/hooks/useCanvasEditor';
+import { usePdfExport } from '@/hooks/usePdfExport';
 import { Canvas } from '@/components/Canvas';
 import { EditorToolbar } from '@/components/EditorToolbar';
 import { PropertiesPanel } from '@/components/PropertiesPanel';
 import { FilterPanel } from '@/components/FilterPanel';
+import { ExportPdfDialog } from '@/components/ExportPdfDialog';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -20,6 +22,7 @@ export default function StudioEditor() {
   const { user, isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const [fileName, setFileName] = useState('');
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   const projectQuery = trpc.projects.getById.useQuery(
     { projectId: Number(projectId) },
@@ -30,6 +33,7 @@ export default function StudioEditor() {
   const addImageMutation = trpc.projects.addImage.useMutation();
 
   const editor = useCanvasEditor();
+  const { exportCanvasToHighResolutionPdf } = usePdfExport();
 
   const handleAddImage = useCallback(() => {
     const input = document.createElement('input');
@@ -124,6 +128,16 @@ export default function StudioEditor() {
     link.click();
   }, [editor.canvasRef]);
 
+  const handleExportPdf = useCallback(async (options: any) => {
+    const projectName = projectQuery.data?.name || 'creation';
+    await exportCanvasToHighResolutionPdf(
+      editor.canvasRef as React.RefObject<HTMLCanvasElement>,
+      editor.canvasState,
+      projectName,
+      options.dpi
+    );
+  }, [editor.canvasRef, editor.canvasState, exportCanvasToHighResolutionPdf, projectQuery.data]);
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -178,7 +192,11 @@ export default function StudioEditor() {
             </Button>
             <Button onClick={handleExportImage} variant="outline">
               <Download className="w-4 h-4 mr-2" />
-              Export
+              Export PNG
+            </Button>
+            <Button onClick={() => setShowExportDialog(true)} variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              Export PDF
             </Button>
           </div>
         </div>
@@ -234,6 +252,13 @@ export default function StudioEditor() {
           </div>
         </div>
       </main>
+
+      <ExportPdfDialog
+        isOpen={showExportDialog}
+        onClose={() => setShowExportDialog(false)}
+        onExport={handleExportPdf}
+        fileName={projectQuery.data?.name || 'creation'}
+      />
     </div>
   );
 }
