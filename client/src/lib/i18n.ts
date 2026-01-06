@@ -90,7 +90,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.support': 'Support',
     'footer.legal': 'Juridique',
     'footer.follow': 'Nous suivre',
-    'footer.copyright': '© 2025 Photo E-Commerce Platform. Tous droits réservés.',
+    'footer.copyright': '© 2025 MAZIGHO STUDIO PHOTO. Tous droits réservés.',
   },
 
   de: {
@@ -175,7 +175,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.support': 'Unterstützung',
     'footer.legal': 'Rechtliches',
     'footer.follow': 'Folgen Sie uns',
-    'footer.copyright': '© 2025 Photo E-Commerce Platform. Alle Rechte vorbehalten.',
+    'footer.copyright': '© 2025 MAZIGHO STUDIO PHOTO. Alle Rechte vorbehalten.',
   },
 
   en: {
@@ -260,7 +260,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.support': 'Support',
     'footer.legal': 'Legal',
     'footer.follow': 'Follow Us',
-    'footer.copyright': '© 2025 Photo E-Commerce Platform. All rights reserved.',
+    'footer.copyright': '© 2025 MAZIGHO STUDIO PHOTO. All rights reserved.',
   },
 
   ar: {
@@ -345,7 +345,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.support': 'الدعم',
     'footer.legal': 'القانوني',
     'footer.follow': 'تابعنا',
-    'footer.copyright': '© 2025 Photo E-Commerce Platform. جميع الحقوق محفوظة.',
+    'footer.copyright': '© 2025 MAZIGHO STUDIO PHOTO. جميع الحقوق محفوظة.',
   },
 };
 

@@ -87,3 +87,9 @@
 - [ ] Pass product type/category to editor
 - [ ] Add "Add to Cart" button after creation
 - [ ] Implement quick create modal for fast creation
+
+
+## Site Branding
+- [x] Change site name from "Photo E-Commerce Platform" to "MAZIGHO STUDIO PHOTO"
+- [x] Update title in footer for all languages
+- [x] Update title in Management UI Settings (via user action)
