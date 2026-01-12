@@ -433,6 +433,82 @@ export const appRouter = router({
         }
       }),
   }),
+  templates: router({
+    getAll: publicProcedure
+      .input(z.object({
+        category: z.enum(['photo', 'book', 'calendar', 'gift']).optional(),
+        subcategory: z.string().optional(),
+        featured: z.boolean().optional(),
+      }))
+      .query(async ({ input }) => {
+        try {
+          const dbTemplates = await import('./db.templates');
+          return await dbTemplates.getTemplates(input);
+        } catch (error) {
+          console.error('[Templates] Error fetching templates:', error);
+          return [];
+        }
+      }),
+
+    getById: publicProcedure
+      .input(z.object({ templateId: z.number() }))
+      .query(async ({ input }) => {
+        try {
+          const dbTemplates = await import('./db.templates');
+          return await dbTemplates.getTemplateById(input.templateId);
+        } catch (error) {
+          console.error('[Templates] Error fetching template:', error);
+          return null;
+        }
+      }),
+
+    getFeatured: publicProcedure.query(async () => {
+      try {
+        const dbTemplates = await import('./db.templates');
+        return await dbTemplates.getFeaturedTemplates();
+      } catch (error) {
+        console.error('[Templates] Error fetching featured templates:', error);
+        return [];
+      }
+    }),
+
+    addFavorite: protectedProcedure
+      .input(z.object({ templateId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const dbTemplates = await import('./db.templates');
+          await dbTemplates.addTemplateFavorite(ctx.user.id, input.templateId);
+          return { success: true };
+        } catch (error) {
+          console.error('[Templates] Error adding favorite:', error);
+          throw new Error('Failed to add favorite');
+        }
+      }),
+
+    removeFavorite: protectedProcedure
+      .input(z.object({ templateId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const dbTemplates = await import('./db.templates');
+          await dbTemplates.removeTemplateFavorite(ctx.user.id, input.templateId);
+          return { success: true };
+        } catch (error) {
+          console.error('[Templates] Error removing favorite:', error);
+          throw new Error('Failed to remove favorite');
+        }
+      }),
+
+    getFavorites: protectedProcedure.query(async ({ ctx }) => {
+      try {
+        const dbTemplates = await import('./db.templates');
+        return await dbTemplates.getUserTemplateFavorites(ctx.user.id);
+      } catch (error) {
+        console.error('[Templates] Error fetching favorites:', error);
+        return [];
+      }
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
+

@@ -93,3 +93,13 @@
 - [x] Change site name from "Photo E-Commerce Platform" to "MAZIGHO STUDIO PHOTO"
 - [x] Update title in footer for all languages
 - [x] Update title in Management UI Settings (via user action)
+
+
+## Template Gallery (Galerie de Modèles)
+- [x] Design template data structure and database schema
+- [x] Create template images and pre-designed layouts
+- [x] Implement tRPC procedures for template management
+- [x] Create template gallery UI component
+- [ ] Implement template loading in editor
+- [x] Add template preview functionality
+- [x] Write unit tests for templates

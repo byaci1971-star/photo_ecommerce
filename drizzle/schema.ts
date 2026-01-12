@@ -283,3 +283,39 @@ export const projectElements = mysqlTable("projectElements", {
 
 export type ProjectElement = typeof projectElements.$inferSelect;
 export type InsertProjectElement = typeof projectElements.$inferInsert;
+
+/**
+ * Template gallery - pre-designed templates for users to start with
+ */
+export const templates = mysqlTable("templates", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 50 }).notNull(), // photo, book, calendar, gift
+  subcategory: varchar("subcategory", { length: 100 }), // e.g., vintage, modern, minimalist
+  thumbnailUrl: varchar("thumbnailUrl", { length: 512 }).notNull(),
+  previewUrl: varchar("previewUrl", { length: 512 }),
+  templateData: text("templateData").notNull(), // JSON stringified template structure
+  tags: varchar("tags", { length: 500 }), // Comma-separated tags
+  featured: int("featured").default(0).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  isPublic: int("isPublic").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Template = typeof templates.$inferSelect;
+export type InsertTemplate = typeof templates.$inferInsert;
+
+/**
+ * User template favorites
+ */
+export const templateFavorites = mysqlTable("templateFavorites", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  templateId: int("templateId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TemplateFavorite = typeof templateFavorites.$inferSelect;
+export type InsertTemplateFavorite = typeof templateFavorites.$inferInsert;
