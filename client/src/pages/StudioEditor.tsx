@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useParams } from 'wouter';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useParams, useLocation } from 'wouter';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trpc } from '@/lib/trpc';
@@ -17,17 +17,20 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SearchBar } from '@/components/SearchBar';
 import { APP_LOGO, APP_TITLE } from '@/const';
-import { Save, Download } from 'lucide-react';
+import { Save, Download, Zap } from 'lucide-react';
 
 export default function StudioEditor() {
   const { projectId } = useParams<{ projectId: string }>();
   const { user, isAuthenticated } = useAuth();
   const { language } = useLanguage();
+  const [, navigate] = useLocation();
   const [fileName, setFileName] = useState('');
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [originalCanvasImage, setOriginalCanvasImage] = useState<string | null>(null);
+  const [showTemplateLoader, setShowTemplateLoader] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
 
   const projectQuery = trpc.projects.getById.useQuery(
     { projectId: Number(projectId) },
@@ -36,9 +39,43 @@ export default function StudioEditor() {
 
   const updateProjectMutation = trpc.projects.update.useMutation();
   const addImageMutation = trpc.projects.addImage.useMutation();
+  const templateQuery = trpc.templates.getAll.useQuery({ featured: true });
 
   const editor = useCanvasEditor();
   const { exportCanvasToHighResolutionPdf } = usePdfExport();
+
+  useEffect(() => {
+    const storedTemplate = sessionStorage.getItem('selectedTemplate');
+    if (storedTemplate) {
+      try {
+        const template = JSON.parse(storedTemplate);
+        setSelectedTemplate(template);
+        loadTemplateElements(template);
+        sessionStorage.removeItem('selectedTemplate');
+      } catch (error) {
+        console.error('Error loading template:', error);
+      }
+    }
+  }, []);
+
+  const loadTemplateElements = useCallback((template: any) => {
+    try {
+      const templateData = JSON.parse(template.templateData);
+      if (templateData.elements && Array.isArray(templateData.elements)) {
+        templateData.elements.forEach((element: any) => {
+          editor.addElement(element);
+        });
+      }
+    } catch (error) {
+      console.error('Error loading template elements:', error);
+    }
+  }, [editor]);
+
+  const handleLoadTemplate = useCallback((template: any) => {
+    setSelectedTemplate(template);
+    loadTemplateElements(template);
+    setShowTemplateLoader(false);
+  }, [loadTemplateElements]);
 
   const handleAddImage = useCallback(() => {
     const input = document.createElement('input');
@@ -49,7 +86,6 @@ export default function StudioEditor() {
       if (!file) return;
 
       try {
-        // For now, create a local data URL
         const reader = new FileReader();
         reader.onload = (event) => {
           const src = event.target?.result as string;
@@ -191,6 +227,10 @@ export default function StudioEditor() {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">{projectQuery.data.name}</h1>
           <div className="flex gap-2">
+            <Button onClick={() => setShowTemplateLoader(!showTemplateLoader)} variant="outline">
+              <Zap className="w-4 h-4 mr-2" />
+              Load Template
+            </Button>
             <Button onClick={handleSave} variant="default">
               <Save className="w-4 h-4 mr-2" />
               Save
@@ -200,94 +240,69 @@ export default function StudioEditor() {
               Export PNG
             </Button>
             <Button onClick={() => setShowExportDialog(true)} variant="outline">
-              <Download className="w-4 h-4 mr-2" />
               Export PDF
-            </Button>
-            <Button onClick={() => setShowPreview(true)} variant="outline">
-              <Download className="w-4 h-4 mr-2" />
-              Preview
             </Button>
           </div>
         </div>
+
+        {showTemplateLoader && (
+          <div className="mb-4 p-4 bg-white rounded-lg border">
+            <h3 className="font-semibold mb-3">Featured Templates</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {templateQuery.data?.map((template: any) => (
+                <div
+                  key={template.id}
+                  className="cursor-pointer border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                  onClick={() => handleLoadTemplate(template)}
+                >
+                  <img
+                    src={template.thumbnailUrl}
+                    alt={template.name}
+                    className="w-full h-24 object-cover"
+                  />
+                  <div className="p-2">
+                    <p className="text-xs font-semibold truncate">{template.name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <EditorToolbar
           onAddImage={handleAddImage}
           onAddText={handleAddText}
-          onDeleteSelected={handleDeleteSelected}
+          onDelete={handleDeleteSelected}
           onDuplicate={handleDuplicate}
-          onBringToFront={() => {
-            if (editor.selectedElementId) {
-              editor.bringToFront(editor.selectedElementId);
-            }
-          }}
-          onSendToBack={() => {
-            if (editor.selectedElementId) {
-              editor.sendToBack(editor.selectedElementId);
-            }
-          }}
-          hasSelectedElement={!!editor.selectedElementId}
         />
 
-        <div className="flex gap-4 flex-1 mt-4">
-          <div className="flex-1 flex flex-col">
-            <Canvas
-              state={editor.canvasState}
-              selectedElementId={editor.selectedElementId}
-              onElementSelect={editor.setSelectedElementId}
-              onElementDragStart={editor.startDrag}
-              onElementDragMove={editor.moveDrag}
-              onElementDragEnd={editor.endDrag}
-              canvasRef={editor.canvasRef as React.RefObject<HTMLCanvasElement>}
-            />
-          </div>
-
-          <div className="w-80 space-y-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
-            <PropertiesPanel
-              element={selectedElement}
-              onUpdate={(updates) => {
-                if (editor.selectedElementId) {
-                  editor.updateElement(editor.selectedElementId, updates);
-                }
-              }}
-            />
-            <FilterPanel
-              element={selectedElement}
-              onUpdate={(updates) => {
-                if (editor.selectedElementId) {
-                  editor.updateElement(editor.selectedElementId, updates);
-                }
-              }}
-            />
+        <div className="flex flex-1 gap-4">
+          <Canvas editor={editor} />
+          <div className="w-64 flex flex-col gap-4">
+            {selectedElement && <PropertiesPanel element={selectedElement} editor={editor} />}
+            <FilterPanel editor={editor} />
           </div>
         </div>
+
+        {showExportDialog && (
+          <ExportPdfDialog onExport={handleExportPdf} onClose={() => setShowExportDialog(false)} />
+        )}
+
+        {showPreview && (
+          <HighResolutionPreview
+            canvasRef={editor.canvasRef}
+            onClose={() => setShowPreview(false)}
+          />
+        )}
+
+        {showComparison && originalCanvasImage && (
+          <BeforeAfterComparison
+            before={originalCanvasImage}
+            after={editor.canvasRef.current?.toDataURL() || ''}
+            onClose={() => setShowComparison(false)}
+          />
+        )}
       </main>
-
-      <ExportPdfDialog
-        isOpen={showExportDialog}
-        onClose={() => setShowExportDialog(false)}
-        onExport={handleExportPdf}
-        fileName={projectQuery.data?.name || 'creation'}
-      />
-
-      {showPreview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold">High Resolution Preview</h2>
-              <button onClick={() => setShowPreview(false)} className="text-gray-500 hover:text-gray-700 text-2xl">
-                ×
-              </button>
-            </div>
-            <div className="p-6">
-              <HighResolutionPreview
-                canvasRef={editor.canvasRef as React.RefObject<HTMLCanvasElement>}
-                projectName={projectQuery.data?.name || 'creation'}
-                onDownload={handleExportImage}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

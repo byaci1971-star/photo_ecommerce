@@ -5,6 +5,8 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 import { storagePut } from "./storage";
+import { templates } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 let stripe: any = null;
 try {
@@ -508,7 +510,97 @@ export const appRouter = router({
       }
     }),
   }),
+
+  admin: router({
+    templates: router({
+      create: protectedProcedure
+        .input(z.object({
+          name: z.string(),
+          description: z.string().optional(),
+          category: z.enum(['photo', 'book', 'calendar', 'gift']),
+          subcategory: z.string().optional(),
+          thumbnailUrl: z.string(),
+          previewUrl: z.string().optional(),
+          templateData: z.string(),
+          tags: z.string().optional(),
+          featured: z.boolean().optional(),
+          sortOrder: z.number().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+          if (ctx.user.role !== 'admin') {
+            throw new Error('Unauthorized');
+          }
+          try {
+            const dbTemplates = await import('./db.templates');
+            return await dbTemplates.createTemplate(input);
+          } catch (error) {
+            console.error('[Admin] Error creating template:', error);
+            throw new Error('Failed to create template');
+          }
+        }),
+
+      update: protectedProcedure
+        .input(z.object({
+          templateId: z.number(),
+          name: z.string().optional(),
+          description: z.string().optional(),
+          featured: z.boolean().optional(),
+          sortOrder: z.number().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+          if (ctx.user.role !== 'admin') {
+            throw new Error('Unauthorized');
+          }
+          try {
+            const dbModule = await import('./db');
+            const dbConnection = await dbModule.getDb();
+            if (!dbConnection) throw new Error('Database connection failed');
+            
+            const updates: Record<string, any> = {};
+            if (input.name !== undefined) updates.name = input.name;
+            if (input.description !== undefined) updates.description = input.description;
+            if (input.featured !== undefined) updates.featured = input.featured ? 1 : 0;
+            if (input.sortOrder !== undefined) updates.sortOrder = input.sortOrder;
+            
+            return await dbConnection.update(templates).set(updates).where(eq(templates.id, input.templateId));
+          } catch (error) {
+            console.error('[Admin] Error updating template:', error);
+            throw new Error('Failed to update template');
+          }
+        }),
+
+      delete: protectedProcedure
+        .input(z.object({ templateId: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+          if (ctx.user.role !== 'admin') {
+            throw new Error('Unauthorized');
+          }
+          try {
+            const dbModule = await import('./db');
+            const dbConnection = await dbModule.getDb();
+            if (!dbConnection) throw new Error('Database connection failed');
+            
+            return await dbConnection.delete(templates).where(eq(templates.id, input.templateId));
+          } catch (error) {
+            console.error('[Admin] Error deleting template:', error);
+            throw new Error('Failed to delete template');
+          }
+        }),
+
+      getAll: protectedProcedure.query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Unauthorized');
+        }
+        try {
+          const dbTemplates = await import('./db.templates');
+          return await dbTemplates.getTemplates({});
+        } catch (error) {
+          console.error('[Admin] Error fetching templates:', error);
+          return [];
+        }
+      }),
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
-
