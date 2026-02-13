@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ZoomIn, ZoomOut, Download, Maximize2, X } from 'lucide-react';
 
 interface HighResolutionPreviewProps {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  projectName: string;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  projectName?: string;
   onDownload?: () => void;
+  onClose?: () => void;
 }
 
 export function HighResolutionPreview({

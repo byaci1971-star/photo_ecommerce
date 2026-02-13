@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 interface FilterPanelProps {
-  element: CanvasElement | null;
-  onUpdate: (updates: Partial<CanvasElement>) => void;
+  element?: CanvasElement | null;
+  onUpdate?: (updates: Partial<CanvasElement>) => void;
+  editor?: any;
 }
 
 export function FilterPanel({ element, onUpdate }: FilterPanelProps) {

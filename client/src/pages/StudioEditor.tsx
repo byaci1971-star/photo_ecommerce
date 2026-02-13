@@ -281,22 +281,27 @@ export default function StudioEditor() {
 
         <div className="flex flex-1 gap-4">
           <Canvas
-            state={editor.state}
+            state={editor.canvasState}
             selectedElementId={editor.selectedElementId}
-            onElementSelect={(id) => editor.selectElement(id)}
-            onElementDragStart={(element, x, y) => editor.startDragging(element, x, y)}
-            onElementDragMove={(x, y) => editor.drag(x, y)}
-            onElementDragEnd={() => editor.stopDragging()}
+            onElementSelect={(id) => editor.setSelectedElementId(id)}
+            onElementDragStart={(element, x, y) => editor.startDrag(element, x, y)}
+            onElementDragMove={(x, y) => editor.moveDrag(x, y)}
+            onElementDragEnd={() => editor.endDrag()}
             canvasRef={editor.canvasRef}
           />
           <div className="w-64 flex flex-col gap-4">
-            {selectedElement && <PropertiesPanel element={selectedElement} editor={editor} />}
+            {selectedElement && <PropertiesPanel element={selectedElement} onUpdate={(updates) => editor.updateElement(selectedElement.id, updates)} />}
             <FilterPanel editor={editor} />
           </div>
         </div>
 
         {showExportDialog && (
-          <ExportPdfDialog onExport={handleExportPdf} onClose={() => setShowExportDialog(false)} />
+          <ExportPdfDialog
+            isOpen={showExportDialog}
+            fileName={projectQuery.data?.name || 'export'}
+            onExport={handleExportPdf}
+            onClose={() => setShowExportDialog(false)}
+          />
         )}
 
         {showPreview && (

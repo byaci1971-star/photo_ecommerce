@@ -2,13 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Image, Type, Trash2, Copy, Undo2, Redo2, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface EditorToolbarProps {
-  onAddImage: () => void;
-  onAddText: () => void;
-  onDeleteSelected: () => void;
-  onDuplicate: () => void;
-  onBringToFront: () => void;
-  onSendToBack: () => void;
-  hasSelectedElement: boolean;
+  onAddImage?: () => void;
+  onAddText?: () => void;
+  onDeleteSelected?: () => void;
+  onDelete?: () => void;
+  onDuplicate?: () => void;
+  onBringToFront?: () => void;
+  onSendToBack?: () => void;
+  hasSelectedElement?: boolean;
 }
 
 export function EditorToolbar({

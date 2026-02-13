@@ -74,7 +74,7 @@ export function ExportPdfDialog({
                     name="quality"
                     value={key}
                     checked={quality === key}
-                    onChange={(e) => setQuality(e.target.value as any)}
+                    onChange={(e) => setQuality(e.target.value as 'standard' | 'high' | 'professional')}
                     className="mr-3"
                   />
                   <div>
