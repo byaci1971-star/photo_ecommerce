@@ -297,9 +297,9 @@ export default function StudioEditor() {
 
         {showComparison && originalCanvasImage && (
           <BeforeAfterComparison
-            before={originalCanvasImage}
-            after={editor.canvasRef.current?.toDataURL() || ''}
-            onClose={() => setShowComparison(false)}
+            originalImage={originalCanvasImage}
+            filteredImage={editor.canvasRef.current?.toDataURL() || ''}
+            title="Avant / Après Comparaison"
           />
         )}
       </main>
