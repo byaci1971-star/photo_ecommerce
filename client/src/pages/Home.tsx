@@ -23,25 +23,21 @@ export default function Home() {
       {/* Header/Navigation */}
       <header className="border-b border-border bg-background sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/">
-            <a className="flex items-center gap-2">
-              <img src={APP_LOGO} alt={APP_TITLE} className="h-8 w-8" />
-              <span className="font-bold text-lg">{APP_TITLE}</span>
-            </a>
+          <Link href="/" className="flex items-center gap-2">
+            <img src={APP_LOGO} alt={APP_TITLE} className="h-8 w-8" />
+            <span className="font-bold text-lg">{APP_TITLE}</span>
           </Link>
           <NavigationMenu />
           <SearchBar />
           <div className="flex gap-4 items-center">
             <div className="hidden md:flex gap-4 items-center">
               <LanguageSwitcher />
-              <Link href="/cart">
-                <a className="relative">
-                  <ShoppingCart className="h-6 w-6" />
-                </a>
+              <Link href="/cart" className="relative">
+                <ShoppingCart className="h-6 w-6" />
               </Link>
               {isAuthenticated ? (
-                <Link href="/account">
-                  <a className="text-sm hover:text-primary">{user?.name || "Account"}</a>
+                <Link href="/account" className="text-sm hover:text-primary">
+                  {user?.name || "Account"}
                 </Link>
               ) : (
                 <Button size="sm" asChild>
@@ -60,9 +56,7 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('home.title', language)}</h1>
           <p className="text-lg mb-8 opacity-90">{t('home.subtitle', language)}</p>
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/studio">
-              <a>{t('home.cta', language)}</a>
-            </Link>
+            <Link href="/studio">{t('home.cta', language)}</Link>
           </Button>
         </div>
       </section>
@@ -101,22 +95,20 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-8">{t('home.our_products', language)}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories?.map((category) => (
-              <Link key={category.id} href={`/category/${category.id}`}>
-                <a className="group">
-                  <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                    {category.image && (
-                      <img
-                        src={category.image}
-                        alt={category.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
-                      />
-                    )}
-                    <CardHeader>
-                      <CardTitle>{category.name}</CardTitle>
-                      <CardDescription>{category.description}</CardDescription>
-                    </CardHeader>
-                  </Card>
-                </a>
+              <Link key={category.id} href={`/category/${category.id}`} className="group">
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                  {category.image && (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
+                    />
+                  )}
+                  <CardHeader>
+                    <CardTitle>{category.name}</CardTitle>
+                    <CardDescription>{category.description}</CardDescription>
+                  </CardHeader>
+                </Card>
               </Link>
             ))}
           </div>
@@ -130,29 +122,27 @@ export default function Home() {
             <h2 className="text-3xl font-bold mb-8">{t('home.featured', language)}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProducts.map((product) => (
-                <Link key={product.id} href={`/product/${product.id}`}>
-                  <a className="group">
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
-                      />
-                      <CardHeader>
-                        <CardTitle className="line-clamp-2">{product.name}</CardTitle>
-                        <div className="flex justify-between items-center mt-4">
-                          <span className="text-2xl font-bold text-purple-600">
-                            CHF {(product.price / 100).toFixed(2)}
+                <Link key={product.id} href={`/product/${product.id}`} className="group">
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
+                    />
+                    <CardHeader>
+                      <CardTitle className="line-clamp-2">{product.name}</CardTitle>
+                      <div className="flex justify-between items-center mt-4">
+                        <span className="text-2xl font-bold text-purple-600">
+                          CHF {(product.price / 100).toFixed(2)}
+                        </span>
+                        {product.originalPrice && (
+                          <span className="text-sm line-through text-gray-500">
+                            CHF {(product.originalPrice / 100).toFixed(2)}
                           </span>
-                          {product.originalPrice && (
-                            <span className="text-sm line-through text-gray-500">
-                              CHF {(product.originalPrice / 100).toFixed(2)}
-                            </span>
-                          )}
-                        </div>
-                      </CardHeader>
-                    </Card>
-                  </a>
+                        )}
+                      </div>
+                    </CardHeader>
+                  </Card>
                 </Link>
               ))}
             </div>
