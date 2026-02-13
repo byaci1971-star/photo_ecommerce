@@ -24,7 +24,7 @@ export function Canvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !state) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
