@@ -132,3 +132,12 @@
 - [ ] Integrate preview in studio editor
 - [ ] Add keyboard shortcuts for page navigation
 - [ ] Implement page export functionality
+
+
+## Preview Integration in Studio Editor
+- [ ] Add preview button to editor toolbar
+- [ ] Create modal component for preview display
+- [ ] Generate pages from canvas state
+- [ ] Connect preview to PageFlipPreview component
+- [ ] Add page generation logic
+- [ ] Write tests for preview integration

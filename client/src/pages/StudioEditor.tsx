@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,12 +12,13 @@ import { FilterPanel } from '@/components/FilterPanel';
 import { ExportPdfDialog } from '@/components/ExportPdfDialog';
 import { HighResolutionPreview } from '@/components/HighResolutionPreview';
 import { BeforeAfterComparison } from '@/components/BeforeAfterComparison';
+import { PreviewModal } from '@/components/PreviewModal';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SearchBar } from '@/components/SearchBar';
 import { APP_LOGO, APP_TITLE } from '@/const';
-import { Save, Download, Zap } from 'lucide-react';
+import { Save, Download, Zap, Eye } from 'lucide-react';
 
 export default function StudioEditor() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -31,6 +32,8 @@ export default function StudioEditor() {
   const [originalCanvasImage, setOriginalCanvasImage] = useState<string | null>(null);
   const [showTemplateLoader, setShowTemplateLoader] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [productType, setProductType] = useState<'book' | 'calendar' | 'poster'>('book');
 
   const projectQuery = trpc.projects.getById.useQuery(
     { projectId: Number(projectId) },
@@ -277,7 +280,15 @@ export default function StudioEditor() {
         />
 
         <div className="flex flex-1 gap-4">
-          <Canvas editor={editor} />
+          <Canvas
+            state={editor.state}
+            selectedElementId={editor.selectedElementId}
+            onElementSelect={(id) => editor.selectElement(id)}
+            onElementDragStart={(element, x, y) => editor.startDragging(element, x, y)}
+            onElementDragMove={(x, y) => editor.drag(x, y)}
+            onElementDragEnd={() => editor.stopDragging()}
+            canvasRef={editor.canvasRef}
+          />
           <div className="w-64 flex flex-col gap-4">
             {selectedElement && <PropertiesPanel element={selectedElement} editor={editor} />}
             <FilterPanel editor={editor} />
