@@ -511,6 +511,112 @@ export const appRouter = router({
     }),
   }),
 
+  pages: router({
+    generate: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        productType: z.enum(['book', 'calendar', 'poster']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const project = await db.getProjectById(input.projectId, ctx.user.id);
+          if (!project) {
+            throw new Error('Unauthorized');
+          }
+
+          const dbPages = await import('./db.pages');
+          const canvasState = JSON.parse(project.data || '{}');
+          return await dbPages.generateProjectPages(
+            input.projectId,
+            canvasState,
+            input.productType
+          );
+        } catch (error) {
+          console.error('[Pages] Error generating pages:', error);
+          throw new Error('Failed to generate pages');
+        }
+      }),
+
+    getAll: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          const project = await db.getProjectById(input.projectId, ctx.user.id);
+          if (!project) {
+            throw new Error('Unauthorized');
+          }
+
+          const dbPages = await import('./db.pages');
+          const pages = await dbPages.getProjectPages(input.projectId);
+          return pages || { projectId: input.projectId, pages: [], totalPages: 0 };
+        } catch (error) {
+          console.error('[Pages] Error fetching pages:', error);
+          return { projectId: input.projectId, pages: [], totalPages: 0 };
+        }
+      }),
+
+    getByNumber: protectedProcedure
+      .input(z.object({ projectId: z.number(), pageNumber: z.number() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          const project = await db.getProjectById(input.projectId, ctx.user.id);
+          if (!project) {
+            throw new Error('Unauthorized');
+          }
+
+          const dbPages = await import('./db.pages');
+          return await dbPages.getPageByNumber(input.projectId, input.pageNumber);
+        } catch (error) {
+          console.error('[Pages] Error fetching page:', error);
+          return null;
+        }
+      }),
+
+    updateContent: protectedProcedure
+      .input(z.object({
+        projectId: z.number(),
+        pageNumber: z.number(),
+        content: z.string(),
+        elements: z.any().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const project = await db.getProjectById(input.projectId, ctx.user.id);
+          if (!project) {
+            throw new Error('Unauthorized');
+          }
+
+          const dbPages = await import('./db.pages');
+          return await dbPages.updatePageContent(
+            input.projectId,
+            input.pageNumber,
+            input.content,
+            input.elements
+          );
+        } catch (error) {
+          console.error('[Pages] Error updating page:', error);
+          throw new Error('Failed to update page');
+        }
+      }),
+
+    exportAll: protectedProcedure
+      .input(z.object({ projectId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          const project = await db.getProjectById(input.projectId, ctx.user.id);
+          if (!project) {
+            throw new Error('Unauthorized');
+          }
+
+          const dbPages = await import('./db.pages');
+          return await dbPages.exportPagesToImages(input.projectId);
+        } catch (error) {
+          console.error('[Pages] Error exporting pages:', error);
+          return [];
+        }
+      }),
+  }),
+
   admin: router({
     templates: router({
       create: protectedProcedure
