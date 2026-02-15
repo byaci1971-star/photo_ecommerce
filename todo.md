@@ -141,3 +141,15 @@
 - [ ] Connect preview to PageFlipPreview component
 - [ ] Add page generation logic
 - [ ] Write tests for preview integration
+
+
+## Project Gallery (Galerie de Projets)
+- [ ] Design project gallery structure and data model
+- [ ] Implement tRPC procedures for project management
+- [ ] Create ProjectGallery component with filtering and sorting
+- [ ] Add duplicate project functionality
+- [ ] Add rename project functionality
+- [ ] Add delete project functionality
+- [ ] Implement project preview thumbnails
+- [ ] Add bulk operations (select multiple, delete multiple)
+- [ ] Write unit tests for project management
